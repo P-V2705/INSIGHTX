@@ -31,6 +31,7 @@ import {
   setOAuthCookie,
   setSessionCookie,
 } from './session.js';
+import { setupDiagnosticEndpoints } from './diagnostic.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -150,6 +151,8 @@ app.get('/api/health', (req, res) => {
     },
   });
 });
+
+setupDiagnosticEndpoints(app, config, parseCookies);
 
 app.get('/api/auth/providers', (req, res) => {
   res.json(providerStatus());

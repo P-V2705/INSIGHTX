@@ -26,7 +26,18 @@ function normalizeCallback(value, fallback) {
   }
 }
 
-const configuredOrigin = normalizeOrigin(text(process.env.APP_ORIGIN)) || (isProduction ? '' : 'http://localhost:5180');
+// Public origin of the Netlify-hosted frontend. Falls back to the production
+// Netlify URL so a Railway deploy without APP_ORIGIN still serves this app.
+const DEFAULT_APP_ORIGIN = 'https://insightx-dev.netlify.app';
+const configuredOrigin =
+  normalizeOrigin(text(process.env.APP_ORIGIN)) || (isProduction ? DEFAULT_APP_ORIGIN : 'http://localhost:5180');
+
+// Public origin of this API server. Railway exposes RAILWAY_PUBLIC_DOMAIN
+// automatically; API_ORIGIN overrides it. OAuth callbacks default to this
+// origin so the provider redirects straight back to the API.
+const railwayDomain = text(process.env.RAILWAY_PUBLIC_DOMAIN);
+const apiOrigin =
+  normalizeOrigin(text(process.env.API_ORIGIN)) || (railwayDomain ? normalizeOrigin(`https://${railwayDomain}`) : '');
 const originInsecure = isProduction && Boolean(configuredOrigin) && !configuredOrigin.startsWith('https://');
 const appOrigin = originInsecure ? '' : configuredOrigin;
 const requestedSecure = text(process.env.COOKIE_SECURE);
@@ -38,7 +49,10 @@ if (isProduction && !cookieSecure) {
   throw new Error('COOKIE_SECURE=false is not permitted in production. Serve Insightx over HTTPS.');
 }
 
-const sameSite = (text(process.env.COOKIE_SAMESITE) || 'lax').toLowerCase();
+// Frontend and API on different hosts need SameSite=None so credentialed
+// fetches from the frontend carry the session cookie.
+const crossSite = Boolean(apiOrigin) && Boolean(appOrigin) && apiOrigin !== appOrigin;
+const sameSite = (text(process.env.COOKIE_SAMESITE) || (crossSite && cookieSecure ? 'none' : 'lax')).toLowerCase();
 if (!['lax', 'strict', 'none'].includes(sameSite)) {
   throw new Error('COOKIE_SAMESITE must be lax, strict, or none.');
 }
@@ -55,7 +69,8 @@ if (cookiePartitioned && !cookieSecure) {
 const rawSessionSecret = text(process.env.SESSION_SECRET);
 const sessionSecret = rawSessionSecret.length >= 32 ? rawSessionSecret : '';
 
-const appCallback = (provider) => (appOrigin ? `${appOrigin}/api/auth/callback/${provider}` : '');
+const callbackOrigin = apiOrigin || appOrigin;
+const appCallback = (provider) => (callbackOrigin ? `${callbackOrigin}/api/auth/callback/${provider}` : '');
 
 const providers = {
   google: {
@@ -84,6 +99,7 @@ export const config = {
   isProduction,
   port: Number(process.env.PORT) || 3001,
   appOrigin,
+  apiOrigin,
   originInsecure,
   providers,
   sessionSecret,

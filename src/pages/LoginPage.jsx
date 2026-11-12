@@ -32,7 +32,7 @@ const ERROR_MESSAGES = {
 };
 
 export default function LoginPage() {
-  const { status, user, providers, serviceAvailable, refresh } = useAuth();
+  const { status, user, providers, serviceAvailable, authError, refresh, signIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [params] = useSearchParams();
@@ -47,7 +47,7 @@ export default function LoginPage() {
   const errorProvider = PROVIDER_LABELS[params.get('provider')];
   const errorMessage = errorCode
     ? `${errorProvider ? `${errorProvider}: ` : ''}${ERROR_MESSAGES[errorCode] || 'Sign-in could not be completed. Try again.'}`
-    : '';
+    : authError;
 
   useEffect(() => {
     if (user) navigate(next, { replace: true });
@@ -86,10 +86,10 @@ export default function LoginPage() {
             </p>
             <ul className="login-aside__list">
               <li>
-                <Check size={14} /> OAuth is handled by your provider and the Insightx server
+                <Check size={14} /> OAuth is handled by your provider and Netlify Identity
               </li>
               <li>
-                <Check size={14} /> An HTTP-only session cookie is used — no provider password is stored
+                <Check size={14} /> A managed sign-in session is used — no provider password is stored
               </li>
               <li>
                 <Check size={14} /> Datasets are never transmitted as part of sign-in
@@ -115,7 +115,7 @@ export default function LoginPage() {
 
           <p className="login-aside__foot">
             <Shield size={14} />
-            OAuth 2.0 · server-side session · sign-in required
+            OAuth 2.0 · managed session · sign-in required
           </p>
         </div>
       </section>
@@ -164,14 +164,15 @@ export default function LoginPage() {
 
               if (configured) {
                 return (
-                  <a
+                  <button
+                    type="button"
                     key={provider.id}
                     className="login-provider"
-                    href={`/api/auth/start/${provider.id}?next=${encodeURIComponent(next)}`}
+                    onClick={() => signIn(provider.id, next)}
                     aria-describedby="login-status"
                   >
                     {content}
-                  </a>
+                  </button>
                 );
               }
 
@@ -193,8 +194,7 @@ export default function LoginPage() {
             {!serviceAvailable && (
               <>
                 <p>
-                  <strong>Sign-in service unavailable.</strong> The Insightx auth server is not reachable. Start
-                  it with <code>npm run dev</code> or <code>npm start</code>, then retry.
+                  <strong>Sign-in service unavailable.</strong> Please retry in a moment. Your dataset stays in this browser.
                 </p>
                 <button type="button" className="btn btn--secondary btn--sm" onClick={() => refresh()}>
                   <Refresh size={14} />
@@ -204,9 +204,7 @@ export default function LoginPage() {
             )}
             {serviceAvailable && !anyConfigured && (
               <p>
-                <strong>No provider is configured yet.</strong> The app owner must add OAuth client credentials
-                and callback URLs as server-side secrets before the workspace can be opened. The buttons stay
-                disabled until then.
+                <strong>No provider is configured yet.</strong> The app owner needs to enable Google and GitHub sign-in before the workspace can be opened.
               </p>
             )}
             {serviceAvailable && anyConfigured && !errorMessage && (
@@ -220,8 +218,8 @@ export default function LoginPage() {
             </span>
             <p>
               {anyConfigured
-                ? 'After your provider confirms the account, Insightx creates an HTTP-only server session and opens the workspace. Signing out clears that session.'
-                : 'Provider buttons stay disabled until the app owner adds client IDs, secrets, and callback URLs through secure server environment settings. Private credentials never belong in client code or this repository. See the README authentication setup.'}
+                ? 'After your provider confirms the account, Netlify Identity creates a secure session and opens the workspace. Signing out clears that session.'
+                : 'The app owner needs to enable Google and GitHub in the project’s Identity provider settings. Retry once setup is complete.'}
             </p>
           </div>
 

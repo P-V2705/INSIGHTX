@@ -1,15 +1,36 @@
-﻿import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { sanitizeNext } from '../../shared/nextPath.js';
 
 const EMPTY_PROVIDERS = { google: false, github: false };
 const AuthContext = createContext(null);
 
-async function getJson(path) {
-  const response = await fetch(path, {
-    credentials: 'same-origin',
+export const API_BASE = (import.meta.env.VITE_API_URL || 'https://insightx-production-e656a82c.up.railway.app').replace(/\/+$/, '');
+
+async function fetchWithFallback(path, options = {}) {
+  const defaultOptions = {
+    credentials: 'include',
     cache: 'no-store',
-    headers: { accept: 'application/json' },
+    ...options,
+    headers: {
+      accept: 'application/json',
+      ...(options.headers || {}),
+    },
     signal: AbortSignal.timeout(8000),
-  });
+  };
+
+  const directUrl = `${API_BASE}${path}`;
+  try {
+    const response = await fetch(directUrl, defaultOptions);
+    if (response.ok) return response;
+  } catch {
+    // If direct request fails (e.g. CORS or network restriction), fallback to same-origin proxy
+  }
+
+  return fetch(path, defaultOptions);
+}
+
+async function getJson(path) {
+  const response = await fetchWithFallback(path);
   if (!response.ok) throw new Error('request_failed');
   return response.json();
 }
@@ -50,12 +71,17 @@ export function AuthProvider({ children }) {
     void refresh();
   }, [refresh]);
 
+  const signIn = useCallback((providerId, nextPath) => {
+    const targetNext = sanitizeNext(nextPath || '/setup');
+    const startUrl = `${API_BASE}/api/auth/start/${providerId}?next=${encodeURIComponent(targetNext)}`;
+    window.location.href = startUrl;
+  }, []);
+
   const signOut = useCallback(async () => {
     const headers = { accept: 'application/json' };
     if (csrfToken) headers['x-csrf-token'] = csrfToken;
-    const response = await fetch('/api/auth/logout', {
+    const response = await fetchWithFallback('/api/auth/logout', {
       method: 'POST',
-      credentials: 'same-origin',
       headers,
     }).catch(() => null);
     if (!response || !response.ok) throw new Error('Sign-out failed.');
@@ -73,9 +99,10 @@ export function AuthProvider({ children }) {
       serviceAvailable,
       isSignedIn: Boolean(user),
       refresh,
+      signIn,
       signOut,
     }),
-    [status, user, csrfToken, providers, serviceAvailable, refresh, signOut],
+    [status, user, csrfToken, providers, serviceAvailable, refresh, signIn, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

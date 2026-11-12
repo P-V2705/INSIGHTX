@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { getSettings, getUser, handleAuthCallback, logout, oauthLogin, onAuthChange } from '@netlify/identity';
 import { sanitizeNext } from '../../shared/nextPath.js';
 
-const EMPTY_PROVIDERS = { google: false, github: false };
+const EMPTY_PROVIDERS = { google: true, github: true };
 const AuthContext = createContext(null);
 const NEXT_KEY = 'insightx.auth.next';
 let callbackPromise;

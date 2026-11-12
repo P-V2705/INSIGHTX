@@ -1,0 +1,242 @@
+/* ============================================================
+   Authentication — loading, account chip, provider state
+   ============================================================ */
+
+.auth-loading {
+  position: relative;
+  overflow: hidden;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+  color: #e7eefb;
+  background:
+    radial-gradient(ellipse 70% 55% at 18% 0%, rgba(37, 99, 235, 0.32), transparent 62%),
+    radial-gradient(ellipse 60% 45% at 100% 100%, rgba(23, 54, 83, 0.85), transparent 72%),
+    linear-gradient(155deg, #071426 0%, #0a1d34 55%, #0b2440 100%);
+}
+
+.auth-loading__glow {
+  position: absolute;
+  width: min(560px, 90vw);
+  height: min(560px, 90vw);
+  border: 1px solid rgba(147, 180, 242, 0.1);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 58px rgba(147, 180, 242, 0.035),
+    0 0 0 124px rgba(147, 180, 242, 0.02);
+  pointer-events: none;
+}
+
+.auth-loading__inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  text-align: center;
+  animation: auth-fade-in 0.35s ease both;
+}
+
+.auth-loading__mark {
+  margin-top: 6px;
+}
+
+.auth-loading__mark span {
+  background: #8fb4ff;
+  width: 5px;
+}
+
+.auth-loading__inner h1 {
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 620;
+  letter-spacing: -0.028em;
+  line-height: 1.15;
+  color: #f5f9ff;
+}
+
+.auth-loading__inner p {
+  max-width: 430px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #9fb2cb;
+}
+
+@keyframes auth-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-loading__inner {
+    animation: none;
+  }
+}
+
+/* Account chip */
+
+.account-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 210px;
+  padding: 4px 11px 4px 4px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface-muted);
+}
+
+.account-chip__avatar {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--navy-900);
+  color: #dce9fb;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.account-chip__meta {
+  display: grid;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.account-chip__meta strong,
+.account-chip__meta small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-chip__meta strong {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.account-chip__meta small {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--muted-soft);
+}
+
+.app-header__error {
+  max-width: 170px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--error);
+}
+
+.workspace-footer__account {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* Login provider states */
+
+.login-auth-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 20px;
+  padding: 11px 12px;
+  border: 1px solid #efc9c3;
+  border-radius: 10px;
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+.login-auth-error svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.login-auth-error p {
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+
+.login-provider.is-disabled {
+  cursor: not-allowed;
+  opacity: 0.66;
+  background: var(--surface-muted);
+  box-shadow: none;
+}
+
+.login-provider.is-disabled:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-muted);
+  box-shadow: none;
+}
+
+.login-provider.is-disabled:active {
+  transform: none;
+}
+
+.login-provider__tag--ready {
+  border-color: #bfe3d2;
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.login-status {
+  display: grid;
+  justify-items: start;
+  gap: 10px;
+  min-height: 38px;
+  margin-top: 11px;
+  font-size: 11.5px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+.login-status strong {
+  font-weight: 650;
+  color: var(--ink-soft);
+}
+
+.login-status code {
+  padding: 1px 4px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+@media (max-width: 1180px) {
+  .account-chip__meta {
+    display: none;
+  }
+
+  .account-chip {
+    padding-right: 4px;
+  }
+}
+
+@media (max-width: 640px) {
+  .account-chip {
+    display: none;
+  }
+
+  .app-header__error {
+    display: none;
+  }
+}

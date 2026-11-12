@@ -1,0 +1,12 @@
+{
+  "name": "Insightx",
+  "type": "single-page application",
+  "fallback": "/index.html",
+  "routes": [
+    { "path": "/", "name": "About", "gated": false },
+    { "path": "/login", "name": "Sign in", "gated": false },
+    { "path": "/setup", "name": "Session setup", "gated": false },
+    { "path": "/analysis", "name": "Analysis", "gated": true, "requires": "prepared dataset" },
+    { "path": "/report", "name": "Final report", "gated": true, "requires": "saved analysis report" }
+  ]
+}

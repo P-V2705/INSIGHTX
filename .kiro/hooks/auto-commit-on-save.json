@@ -1,0 +1,15 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Auto-commit on file save",
+      "trigger": "PostFileSave",
+      "description": "Automatically stages, commits, and pushes changes whenever you save a file in src/, server/, shared/, or public/ directories",
+      "matcher": "^src/|^server/|^shared/|^public/",
+      "action": {
+        "type": "command",
+        "command": "cd \"$env:KIRO_WORKSPACE_PATH\" && git add -A && git commit -m \"Auto-commit: Changes to $(Split-Path -Leaf $env:KIRO_FILE_PATH)\" && git push origin main"
+      }
+    }
+  ]
+}

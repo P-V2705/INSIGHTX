@@ -27,7 +27,7 @@
 - Entry: server/index.js
 - Port: 3001
 - Dependencies: Express, Jose (JWT), crypto
-- Deploy target: Railway / Render / Heroku
+- Deploy target: Railway
 
 ### OAuth Flow
 - Google OAuth: https://accounts.google.com
@@ -46,7 +46,7 @@
 5. ⏳ GitHub connection: NOT YET
 
 ### PHASE 2: Backend (Production Service)
-1. ⏳ Hosting: Choose Railway / Render / Heroku
+1. ⏳ Hosting: Choose Railway
 2. ⏳ Node version: 22.9+
 3. ⏳ Environment variables: NOT CONFIGURED
 4. ⏳ OAuth credentials: NOT SET
@@ -59,15 +59,15 @@
 ### Frontend (Netlify)
 - None needed - frontend is static SPA
 
-### Backend (Railway/Render)
-- APP_ORIGIN: Production URL (e.g., https://insightx.netlify.app)
+### Backend (Railway)
+- APP_ORIGIN: Production URL (e.g., https://insightx-dev.netlify.app)
 - GOOGLE_CLIENT_ID: From Google Cloud Console
 - GOOGLE_CLIENT_SECRET: From Google Cloud Console
 - GITHUB_CLIENT_ID: From GitHub App
 - GITHUB_CLIENT_SECRET: From GitHub App
 - SESSION_SECRET: Min 32 random chars
 - COOKIE_SECURE: true
-- COOKIE_SAMESITE: lax
+- COOKIE_SAMESITE: none (frontend and API are on different sites)
 - TRUST_PROXY: true
 - PORT: 3001 (or set by platform)
 
@@ -78,8 +78,6 @@
 ### Step 1: Choose Backend Hosting
 Options:
 - Railway (⭐ Recommended - simplest)
-- Render (good free tier)
-- Heroku (mature)
 
 ### Step 2: Get OAuth Credentials
 1. Google: https://console.cloud.google.com
@@ -91,7 +89,7 @@ Options:
 
 ### Step 3: Deploy Backend
 1. Push current code to GitHub (already done ✅)
-2. Connect repo to Railway/Render
+2. Connect repo to Railway
 3. Set environment variables
 4. Deploy
 
@@ -103,11 +101,11 @@ Options:
 5. Deploy → Get URL (e.g., insightx.netlify.app)
 
 ### Step 5: Update Backend URL
-1. Get backend public URL from Railway/Render
+1. Get backend public URL from Railway
 2. Update OAuth callback URLs:
    - Google: https://{backend-url}/api/auth/callback/google
    - GitHub: https://{backend-url}/api/auth/callback/github
-3. Set APP_ORIGIN in backend: https://insightx.netlify.app
+3. Set APP_ORIGIN in backend: https://insightx-dev.netlify.app
 
 ### Step 6: Update Frontend (Optional)
 Add API_BASE_URL env var if backend not on same domain:
@@ -140,7 +138,7 @@ Add API_BASE_URL env var if backend not on same domain:
 
 ### Issue 4: HTTPS Requirement
 - OAuth requires HTTPS
-- Both Netlify and Railway/Render provide HTTPS ✅
+- Both Netlify and Railway provide HTTPS ✅
 
 ---
 

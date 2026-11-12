@@ -123,8 +123,32 @@ function readOAuthState(req, provider) {
   return state && state.provider === provider ? state : null;
 }
 
+// Reports which pieces of auth configuration are present (booleans only, never
+// values) so a "Setup required" state can be diagnosed without server logs.
 app.get('/api/health', (req, res) => {
-  res.json({ ok: true });
+  const providerChecks = Object.fromEntries(
+    PROVIDER_IDS.map((id) => {
+      const settings = config.providers[id];
+      return [
+        id,
+        {
+          clientId: Boolean(settings.clientId),
+          clientSecret: Boolean(settings.clientSecret),
+          callbackUrl: Boolean(settings.callbackUrl),
+          ready: providerConfigured(id),
+        },
+      ];
+    }),
+  );
+  res.json({
+    ok: true,
+    auth: {
+      appOrigin: config.appOrigin || null,
+      sessionSecret: Boolean(config.sessionSecret),
+      cookieSameSite: config.cookieSameSite,
+      providers: providerChecks,
+    },
+  });
 });
 
 app.get('/api/auth/providers', (req, res) => {

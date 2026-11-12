@@ -1,16 +1,27 @@
-﻿import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 const EMPTY_PROVIDERS = { google: false, github: false };
 const AuthContext = createContext(null);
 
+// API base URL - uses environment variable or defaults to current origin
+const API_BASE_URL = import.meta.env.REACT_APP_API_URL || window.location.origin;
+
 async function getJson(path) {
-  const response = await fetch(path, {
-    credentials: 'same-origin',
+  const url = path.startsWith('http') ? path : `${API_BASE_URL}${path}`;
+  console.debug(`[AuthProvider] Fetching: ${url}`);
+  
+  const response = await fetch(url, {
+    credentials: 'include', // Include cookies for cross-origin Railway requests
     cache: 'no-store',
     headers: { accept: 'application/json' },
     signal: AbortSignal.timeout(8000),
   });
-  if (!response.ok) throw new Error('request_failed');
+  
+  if (!response.ok) {
+    console.error(`[AuthProvider] Fetch failed: ${response.status} ${response.statusText}`);
+    throw new Error('request_failed');
+  }
+  
   return response.json();
 }
 
@@ -26,17 +37,28 @@ export function AuthProvider({ children }) {
     try {
       const session = await getJson('/api/auth/me');
       const configured = await getJson('/api/auth/providers').catch(() => ({}));
+      
       const nextUser = session.user || null;
       setUser(nextUser);
       setCsrfToken(session.csrfToken || null);
+      
+      // Handle both response formats: { google: true } and { providers: { google: true } }
+      const providerConfig = configured.providers || configured;
       setProviders({
-        google: configured.google === true,
-        github: configured.github === true,
+        google: providerConfig.google === true,
+        github: providerConfig.github === true,
       });
+      
+      console.debug('[AuthProvider] Authentication refreshed successfully', {
+        user: nextUser?.email,
+        providers: { google: providerConfig.google, github: providerConfig.github },
+      });
+      
       setServiceAvailable(true);
       setStatus('ready');
       return { user: nextUser, serviceAvailable: true };
-    } catch {
+    } catch (error) {
+      console.error('[AuthProvider] Authentication refresh failed:', error.message);
       setUser(null);
       setCsrfToken(null);
       setProviders(EMPTY_PROVIDERS);
@@ -53,12 +75,24 @@ export function AuthProvider({ children }) {
   const signOut = useCallback(async () => {
     const headers = { accept: 'application/json' };
     if (csrfToken) headers['x-csrf-token'] = csrfToken;
-    const response = await fetch('/api/auth/logout', {
+    
+    const url = `${API_BASE_URL}/api/auth/logout`;
+    console.debug(`[AuthProvider] Signing out: ${url}`);
+    
+    const response = await fetch(url, {
       method: 'POST',
-      credentials: 'same-origin',
+      credentials: 'include', // Include cookies for cross-origin Railway requests
       headers,
-    }).catch(() => null);
-    if (!response || !response.ok) throw new Error('Sign-out failed.');
+    }).catch((error) => {
+      console.error('[AuthProvider] Sign-out request failed:', error.message);
+      return null;
+    });
+    
+    if (!response || !response.ok) {
+      console.error('[AuthProvider] Sign-out failed:', response?.statusText);
+      throw new Error('Sign-out failed.');
+    }
+    
     setUser(null);
     setCsrfToken(null);
     setStatus('ready');

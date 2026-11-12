@@ -161,6 +161,7 @@ export function originAllowed(req) {
   if (!origin) return true;
   const allowed = new Set();
   if (config.appOrigin) allowed.add(config.appOrigin);
+  for (const origin of config.corsOrigins) allowed.add(origin);
   const host = req.get('host');
   if (host) {
     allowed.add(`https://${host}`);

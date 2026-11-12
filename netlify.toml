@@ -1,13 +1,16 @@
-﻿[build]
+[build]
   command = "npm run build"
   publish = "dist"
 
+# Same-origin proxy to the Railway auth API. Used as a fallback when the
+# browser cannot reach the Railway origin directly (CORS / network issues).
 [[redirects]]
   from = "/api/*"
   to = "https://insightx-production-e656a82c.up.railway.app/api/:splat"
   status = 200
   force = true
 
+# Single-page application fallback.
 [[redirects]]
   from = "/*"
   to = "/index.html"

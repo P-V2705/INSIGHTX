@@ -4,35 +4,60 @@ import { sanitizeNext } from '../../shared/nextPath.js';
 const EMPTY_PROVIDERS = { google: false, github: false };
 const AuthContext = createContext(null);
 
-export const API_BASE = (import.meta.env.VITE_API_URL || 'https://insightx-production-e656a82c.up.railway.app').replace(/\/+$/, '');
+const RAILWAY_API = 'https://insightx-production-e656a82c.up.railway.app';
 
-async function fetchWithFallback(path, options = {}) {
-  const defaultOptions = {
+// Base URL of the Railway auth API. Override at build time with VITE_API_URL.
+export const API_BASE = (import.meta.env.VITE_API_URL || RAILWAY_API).trim().replace(/\/+$/, '');
+
+const REQUEST_TIMEOUT_MS = 10000;
+
+function requestOptions(options = {}) {
+  return {
+    method: 'GET',
     credentials: 'include',
     cache: 'no-store',
+    mode: 'cors',
     ...options,
     headers: {
       accept: 'application/json',
       ...(options.headers || {}),
     },
-    signal: AbortSignal.timeout(8000),
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   };
+}
 
-  const directUrl = `${API_BASE}${path}`;
-  try {
-    const response = await fetch(directUrl, defaultOptions);
-    if (response.ok) return response;
-  } catch {
-    // If direct request fails (e.g. CORS or network restriction), fallback to same-origin proxy
+// Reads a JSON body, rejecting HTML fallbacks (e.g. index.html served for an
+// unknown path) so they are never mistaken for an API response.
+async function readJson(response) {
+  const type = response.headers.get('content-type') || '';
+  if (!type.includes('application/json')) throw new Error('invalid_response');
+  return response.json();
+}
+
+// Calls the Railway API directly (credentialed CORS). If the browser cannot
+// reach it — network failure, CORS rejection, or a non-JSON reply — it retries
+// through the same-origin Netlify proxy (/api/* -> Railway).
+async function apiRequest(path, options = {}) {
+  const attempts = API_BASE ? [`${API_BASE}${path}`, path] : [path];
+  let lastError = new Error('request_failed');
+  for (const url of attempts) {
+    try {
+      const response = await fetch(url, requestOptions(options));
+      const data = await readJson(response).catch(() => {
+        throw new Error('invalid_response');
+      });
+      return { ok: response.ok, status: response.status, data };
+    } catch (error) {
+      lastError = error;
+    }
   }
-
-  return fetch(path, defaultOptions);
+  throw lastError;
 }
 
 async function getJson(path) {
-  const response = await fetchWithFallback(path);
-  if (!response.ok) throw new Error('request_failed');
-  return response.json();
+  const result = await apiRequest(path);
+  if (!result.ok) throw new Error('request_failed');
+  return result.data;
 }
 
 export function AuthProvider({ children }) {
@@ -41,30 +66,43 @@ export function AuthProvider({ children }) {
   const [csrfToken, setCsrfToken] = useState(null);
   const [providers, setProviders] = useState(EMPTY_PROVIDERS);
   const [serviceAvailable, setServiceAvailable] = useState(false);
+  const [authError, setAuthError] = useState(null);
 
   const refresh = useCallback(async ({ quiet = false } = {}) => {
     if (!quiet) setStatus('loading');
+
+    let configured;
     try {
-      const session = await getJson('/api/auth/me');
-      const configured = await getJson('/api/auth/providers').catch(() => ({}));
-      const nextUser = session.user || null;
-      setUser(nextUser);
-      setCsrfToken(session.csrfToken || null);
-      setProviders({
-        google: configured.google === true,
-        github: configured.github === true,
-      });
-      setServiceAvailable(true);
-      setStatus('ready');
-      return { user: nextUser, serviceAvailable: true };
+      configured = await getJson('/api/auth/providers');
     } catch {
       setUser(null);
       setCsrfToken(null);
       setProviders(EMPTY_PROVIDERS);
       setServiceAvailable(false);
+      setAuthError(null);
       setStatus('unavailable');
       return { user: null, serviceAvailable: false };
     }
+
+    setProviders({
+      google: configured?.google === true,
+      github: configured?.github === true,
+    });
+    setServiceAvailable(true);
+
+    let nextUser = null;
+    try {
+      const session = await getJson('/api/auth/me');
+      nextUser = session?.user || null;
+      setCsrfToken(session?.csrfToken || null);
+      setAuthError(null);
+    } catch {
+      setCsrfToken(null);
+      setAuthError('Your session could not be confirmed. Sign in again.');
+    }
+    setUser(nextUser);
+    setStatus('ready');
+    return { user: nextUser, serviceAvailable: true };
   }, []);
 
   useEffect(() => {
@@ -78,13 +116,14 @@ export function AuthProvider({ children }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    const headers = { accept: 'application/json' };
+    const headers = { 'content-type': 'application/json' };
     if (csrfToken) headers['x-csrf-token'] = csrfToken;
-    const response = await fetchWithFallback('/api/auth/logout', {
+    const result = await apiRequest('/api/auth/logout', {
       method: 'POST',
       headers,
+      body: '{}',
     }).catch(() => null);
-    if (!response || !response.ok) throw new Error('Sign-out failed.');
+    if (!result || !result.ok) throw new Error('Sign-out failed.');
     setUser(null);
     setCsrfToken(null);
     setStatus('ready');
@@ -97,12 +136,13 @@ export function AuthProvider({ children }) {
       csrfToken,
       providers,
       serviceAvailable,
+      authError,
       isSignedIn: Boolean(user),
       refresh,
       signIn,
       signOut,
     }),
-    [status, user, csrfToken, providers, serviceAvailable, refresh, signIn, signOut],
+    [status, user, csrfToken, providers, serviceAvailable, authError, refresh, signIn, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

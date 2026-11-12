@@ -1,5 +1,6 @@
 import { lazy, useEffect } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
+import { Analytics } from '@vercel/analytics/react';
 import { SessionProvider } from './session/SessionProvider.jsx';
 import { AuthProvider } from './auth/AuthProvider.jsx';
 import { RequireAuth } from './auth/RequireAuth.jsx';
@@ -52,6 +53,7 @@ export default function App() {
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
+        <Analytics />
       </SessionProvider>
     </AuthProvider>
   );

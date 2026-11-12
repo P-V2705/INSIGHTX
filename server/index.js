@@ -57,16 +57,23 @@ const rateCleanup = setInterval(() => {
 }, 10 * 60 * 1000);
 rateCleanup.unref();
 
-// CORS Configuration for credentialed cross-origin requests
-const corsOrigin = config.appOrigin || "http://localhost:5180";
+// CORS for credentialed cross-origin requests from the frontend (Netlify).
+// Allowed origins: APP_ORIGIN plus optional comma-separated CORS_ALLOWED_ORIGINS.
+const corsOrigin = config.appOrigin;
+const allowedOrigins = new Set([config.appOrigin, ...config.corsOrigins].filter(Boolean));
+
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", corsOrigin);
-  res.setHeader("Access-Control-Allow-Credentials", "true");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, x-csrf-token");
-  res.setHeader("Access-Control-Max-Age", "86400");
-  if (req.method === "OPTIONS") return res.sendStatus(200);
-  next();
+  const origin = req.get('origin');
+  res.append('Vary', 'Origin');
+  if (origin && allowedOrigins.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, X-CSRF-Token');
+    res.setHeader('Access-Control-Max-Age', '86400');
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  return next();
 });
 
 const frameAncestors = ["'self'", ...config.embedOrigins].join(' ');

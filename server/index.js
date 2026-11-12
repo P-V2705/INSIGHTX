@@ -57,6 +57,18 @@ const rateCleanup = setInterval(() => {
 }, 10 * 60 * 1000);
 rateCleanup.unref();
 
+// CORS Configuration for credentialed cross-origin requests
+const corsOrigin = config.appOrigin || "http://localhost:5180";
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", corsOrigin);
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, x-csrf-token");
+  res.setHeader("Access-Control-Max-Age", "86400");
+  if (req.method === "OPTIONS") return res.sendStatus(200);
+  next();
+});
+
 const frameAncestors = ["'self'", ...config.embedOrigins].join(' ');
 const contentSecurityPolicy = [
   "default-src 'self'",
@@ -95,7 +107,7 @@ function loginRedirect(res, code, { provider, next } = {}) {
   if (provider && PROVIDER_IDS.includes(provider)) params.set('provider', provider);
   if (next) params.set('next', sanitizeNext(next));
   res.setHeader('Cache-Control', 'no-store');
-  return res.redirect(302, `/login?${params.toString()}`);
+  return res.redirect(302, `${corsOrigin}/login?${params.toString()}`);
 }
 
 function readOAuthState(req, provider) {
@@ -209,7 +221,7 @@ async function handleCallback(req, res) {
     setSessionCookie(res, sid);
     setCsrfCookie(res, record.csrf);
     res.setHeader('Cache-Control', 'no-store');
-    return res.redirect(302, `/auth/complete?next=${encodeURIComponent(state.next)}`);
+    return res.redirect(302, `${corsOrigin}/auth/complete?next=${encodeURIComponent(state.next)}`);
   } catch (error) {
     const code = error instanceof AuthError ? error.code : 'exchange_failed';
     console.warn(`[auth] ${provider} callback failed: ${code}`);
@@ -297,3 +309,7 @@ app.listen(config.port, () => {
     console.log('[server] static file serving is disabled (SERVE_STATIC=false).');
   }
 });
+
+
+
+

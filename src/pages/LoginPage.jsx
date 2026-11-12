@@ -86,10 +86,10 @@ export default function LoginPage() {
             </p>
             <ul className="login-aside__list">
               <li>
-                <Check size={14} /> OAuth is handled by your provider and Netlify Identity
+                <Check size={14} /> OAuth is handled by your provider and the Insightx server
               </li>
               <li>
-                <Check size={14} /> A managed sign-in session is used — no provider password is stored
+                <Check size={14} /> A secure HTTP-only session is used — no provider password is stored
               </li>
               <li>
                 <Check size={14} /> Datasets are never transmitted as part of sign-in
@@ -218,8 +218,8 @@ export default function LoginPage() {
             </span>
             <p>
               {anyConfigured
-                ? 'After your provider confirms the account, Netlify Identity creates a secure session and opens the workspace. Signing out clears that session.'
-                : 'The app owner needs to enable Google and GitHub in the project’s Identity provider settings. Retry once setup is complete.'}
+                ? 'After your provider confirms the account, Insightx creates an HTTP-only server session and opens the workspace. Signing out clears that session.'
+                : 'The app owner needs to configure Google and GitHub OAuth credentials in the backend environment settings. Retry once setup is complete.'}
             </p>
           </div>
 

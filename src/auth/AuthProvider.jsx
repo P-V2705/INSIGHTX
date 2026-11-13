@@ -1,13 +1,33 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+﻿import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { sanitizeNext } from '../../shared/nextPath.js';
 
 const EMPTY_PROVIDERS = { google: false, github: false };
 const AuthContext = createContext(null);
 
+// Production Railway API backend
 const RAILWAY_API = 'https://insightx-production-e656a82c.up.railway.app';
 
-// Base URL of the Railway auth API. Override at build time with VITE_API_URL.
-export const API_BASE = (import.meta.env.VITE_API_URL || RAILWAY_API).trim().replace(/\/+$/, '');
+// Determine API base URL:
+// 1. If VITE_API_URL is explicitly set, use it (allows override at build time)
+// 2. Otherwise, use Railway API (hardcoded fallback for production)
+// 3. Empty strings are normalized to allow Netlify same-origin proxy fallback
+function getApiBase() {
+  const envUrl = (import.meta.env.VITE_API_URL || '').trim();
+  if (envUrl) {
+    // Explicit URL provided - validate and normalize
+    try {
+      const url = new URL(envUrl);
+      return url.origin; // Normalize to origin only (remove path/query)
+    } catch {
+      console.warn('[AuthProvider] Invalid VITE_API_URL, falling back to Railway:', envUrl);
+      return RAILWAY_API;
+    }
+  }
+  // No explicit URL - use Railway as default for production
+  return RAILWAY_API;
+}
+
+export const API_BASE = getApiBase();
 
 const REQUEST_TIMEOUT_MS = 10000;
 
@@ -34,23 +54,49 @@ async function readJson(response) {
   return response.json();
 }
 
-// Calls the Railway API directly (credentialed CORS). If the browser cannot
-// reach it — network failure, CORS rejection, or a non-JSON reply — it retries
-// through the same-origin Netlify proxy (/api/* -> Railway).
+// Dual-path fetch strategy for cross-origin API calls:
+// 1. Try direct Railway API call (credentialed CORS)
+// 2. If that fails, fall back to same-origin Netlify proxy (/api/* -> Railway)
+//
+// This handles:
+// - Network/CORS failures: Falls back to proxy
+// - HTML responses (served for unknown paths): Retried through proxy
+// - Cookie persistence: Attempts direct first, then proxy
 async function apiRequest(path, options = {}) {
-  const attempts = API_BASE ? [`${API_BASE}${path}`, path] : [path];
+  // Build attempt URLs
+  const directUrl = API_BASE ? `${API_BASE}${path}` : null;
+  const proxyUrl = path; // Same-origin proxy (Netlify redirects /api/* to Railway)
+  
+  const attempts = directUrl ? [directUrl, proxyUrl] : [proxyUrl];
   let lastError = new Error('request_failed');
-  for (const url of attempts) {
+  
+  for (let i = 0; i < attempts.length; i++) {
+    const url = attempts[i];
+    const isDirectAttempt = i === 0 && directUrl;
+    
     try {
+      console.debug(`[AuthProvider] Attempt ${i + 1}/${attempts.length}: ${url}`);
       const response = await fetch(url, requestOptions(options));
       const data = await readJson(response).catch(() => {
         throw new Error('invalid_response');
       });
-      return { ok: response.ok, status: response.status, data };
+      
+      if (!response.ok) {
+        console.warn(`[AuthProvider] Response not OK (${response.status}), retrying...`);
+        lastError = new Error('request_failed');
+        continue;
+      }
+      
+      console.debug(`[AuthProvider] Success on ${isDirectAttempt ? 'direct' : 'proxy'} attempt`);
+      return { ok: true, status: response.status, data };
     } catch (error) {
+      console.debug(
+        `[AuthProvider] ${isDirectAttempt ? 'Direct' : 'Proxy'} attempt failed: ${error.message}`
+      );
       lastError = error;
     }
   }
+  
   throw lastError;
 }
 

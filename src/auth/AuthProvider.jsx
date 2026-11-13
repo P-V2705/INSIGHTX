@@ -1,4 +1,4 @@
-﻿import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { sanitizeNext } from '../../shared/nextPath.js';
 
 const EMPTY_PROVIDERS = { google: false, github: false };

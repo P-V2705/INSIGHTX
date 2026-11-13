@@ -1,4 +1,4 @@
-﻿# Insightx Production Deployment Status
+# Insightx Production Deployment Status
 
 Frontend (Netlify): https://insightx-dev.netlify.app
 Backend (Railway): https://insightx-production-e656a82c.up.railway.app

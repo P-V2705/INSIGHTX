@@ -6,7 +6,7 @@ GitHub: https://github.com/P-V2705/INSIGHTX
 
 ## Required Railway variables
 
-All authentication traffic (sign-in, OAuth callback, /api/auth/me, logout) flows through the Netlify proxy (/api/* -> Railway), ensuring cookies are first-party to insight-dev.netlify.app and not blocked by browsers.
+All authentication traffic (sign-in, OAuth callback, /api/auth/me, logout) flows through the Netlify proxy (/api/* -> Railway), ensuring cookies are first-party to insightx-dev.netlify.app and not blocked by browsers.
 
 **Critical Railway environment variables:**
 
@@ -39,7 +39,7 @@ All authentication traffic (sign-in, OAuth callback, /api/auth/me, logout) flows
 2. Netlify proxy intercepts: `/api/*` → `https://insightx-production-e656a82c.up.railway.app/api/:splat`
 3. Railway backend receives request, validates session, returns user + CSRF token
 4. Railway sets `Set-Cookie: insightx_sid=...` with `Domain=` (empty, means current domain in response)
-5. Browser receives response from Netlify origin, stores cookie as first-party to insight-dev.netlify.app
+5. Browser receives response from Netlify origin, stores cookie as first-party to insightx-dev.netlify.app
 6. Next request includes the cookie automatically (same-origin)
 7. No third-party cookie blocking, authentication works
 

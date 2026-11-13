@@ -3,7 +3,7 @@
   publish = "dist"
 
 # Same-origin proxy to Railway. All /api/* requests are routed here.
-# This ensures cookies are first-party to the frontend domain (insight-dev.netlify.app).
+# This ensures cookies are first-party to the frontend domain (insightx-dev.netlify.app).
 [[redirects]]
   from = "/api/*"
   to = "https://insightx-production-e656a82c.up.railway.app/api/:splat"

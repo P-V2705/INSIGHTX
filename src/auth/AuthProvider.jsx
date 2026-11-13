@@ -4,30 +4,10 @@ import { sanitizeNext } from '../../shared/nextPath.js';
 const EMPTY_PROVIDERS = { google: false, github: false };
 const AuthContext = createContext(null);
 
-// Production Railway API backend
-const RAILWAY_API = 'https://insightx-production-e656a82c.up.railway.app';
-
-// Determine API base URL:
-// 1. If VITE_API_URL is explicitly set, use it (allows override at build time)
-// 2. Otherwise, use Railway API (hardcoded fallback for production)
-// 3. Empty strings are normalized to allow Netlify same-origin proxy fallback
-function getApiBase() {
-  const envUrl = (import.meta.env.VITE_API_URL || '').trim();
-  if (envUrl) {
-    // Explicit URL provided - validate and normalize
-    try {
-      const url = new URL(envUrl);
-      return url.origin; // Normalize to origin only (remove path/query)
-    } catch {
-      console.warn('[AuthProvider] Invalid VITE_API_URL, falling back to Railway:', envUrl);
-      return RAILWAY_API;
-    }
-  }
-  // No explicit URL - use Railway as default for production
-  return RAILWAY_API;
-}
-
-export const API_BASE = getApiBase();
+// API base URL for auth requests. Empty means same-origin requests through Netlify proxy.
+// For local development, set VITE_API_URL to http://localhost:3001 or similar.
+// In production, leave empty so all requests use /api/* (Netlify proxy to Railway).
+export const API_BASE = (import.meta.env.VITE_API_URL || '').trim().replace(/\/+$/, '');
 
 const REQUEST_TIMEOUT_MS = 10000;
 
@@ -54,50 +34,28 @@ async function readJson(response) {
   return response.json();
 }
 
-// Dual-path fetch strategy for cross-origin API calls:
-// 1. Try direct Railway API call (credentialed CORS)
-// 2. If that fails, fall back to same-origin Netlify proxy (/api/* -> Railway)
-//
-// This handles:
-// - Network/CORS failures: Falls back to proxy
-// - HTML responses (served for unknown paths): Retried through proxy
-// - Cookie persistence: Attempts direct first, then proxy
+// All auth requests go through the same-origin Netlify proxy (/api/* -> Railway),
+// ensuring cookies are first-party to the frontend domain (insight-dev.netlify.app).
+// This prevents browsers from blocking third-party cookies set by the Railway backend.
 async function apiRequest(path, options = {}) {
-  // Build attempt URLs
-  const directUrl = API_BASE ? `${API_BASE}${path}` : null;
-  const proxyUrl = path; // Same-origin proxy (Netlify redirects /api/* to Railway)
+  const url = API_BASE ? `${API_BASE}${path}` : path;
   
-  const attempts = directUrl ? [directUrl, proxyUrl] : [proxyUrl];
-  let lastError = new Error('request_failed');
-  
-  for (let i = 0; i < attempts.length; i++) {
-    const url = attempts[i];
-    const isDirectAttempt = i === 0 && directUrl;
+  try {
+    console.debug(`[AuthProvider] Fetching: ${url}`);
+    const response = await fetch(url, requestOptions(options));
+    const data = await readJson(response).catch(() => {
+      throw new Error('invalid_response');
+    });
     
-    try {
-      console.debug(`[AuthProvider] Attempt ${i + 1}/${attempts.length}: ${url}`);
-      const response = await fetch(url, requestOptions(options));
-      const data = await readJson(response).catch(() => {
-        throw new Error('invalid_response');
-      });
-      
-      if (!response.ok) {
-        console.warn(`[AuthProvider] Response not OK (${response.status}), retrying...`);
-        lastError = new Error('request_failed');
-        continue;
-      }
-      
-      console.debug(`[AuthProvider] Success on ${isDirectAttempt ? 'direct' : 'proxy'} attempt`);
-      return { ok: true, status: response.status, data };
-    } catch (error) {
-      console.debug(
-        `[AuthProvider] ${isDirectAttempt ? 'Direct' : 'Proxy'} attempt failed: ${error.message}`
-      );
-      lastError = error;
+    if (!response.ok) {
+      throw new Error('request_failed');
     }
+    
+    return { ok: true, status: response.status, data };
+  } catch (error) {
+    console.error(`[AuthProvider] Request failed: ${error.message}`);
+    throw error;
   }
-  
-  throw lastError;
 }
 
 async function getJson(path) {
@@ -157,7 +115,7 @@ export function AuthProvider({ children }) {
 
   const signIn = useCallback((providerId, nextPath) => {
     const targetNext = sanitizeNext(nextPath || '/setup');
-    const startUrl = `${API_BASE}/api/auth/start/${providerId}?next=${encodeURIComponent(targetNext)}`;
+    const startUrl = `${API_BASE ? API_BASE : window.location.origin}/api/auth/start/${providerId}?next=${encodeURIComponent(targetNext)}`;
     window.location.href = startUrl;
   }, []);
 

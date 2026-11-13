@@ -2,7 +2,7 @@
 
 ## Introduction
 
-OAuth sign-in (Google and GitHub) on https://insightx-dev.netlify.app fails during the OAuth callback phase because auth state and session cookies are set on the wrong domain (Railway backend) instead of the correct domain (Netlify frontend). The fix requires ensuring all auth requests use relative URLs through the same-origin Netlify proxy (`/api/*`), which are transparently rewritten to the Railway backend. This guarantees cookies are first-party to insight-dev.netlify.app, not third-party to the Railway domain.
+OAuth sign-in (Google and GitHub) on https://insightx-dev.netlify.app fails during the OAuth callback phase because auth state and session cookies are set on the wrong domain (Railway backend) instead of the correct domain (Netlify frontend). The fix requires ensuring all auth requests use relative URLs through the same-origin Netlify proxy (`/api/*`), which are transparently rewritten to the Railway backend. This guarantees cookies are first-party to insightx-dev.netlify.app, not third-party to the Railway domain.
 
 ## Bug Analysis
 
@@ -20,17 +20,17 @@ OAuth sign-in (Google and GitHub) on https://insightx-dev.netlify.app fails duri
 
 2.1 WHEN `API_BASE` is empty (because `VITE_API_URL` is not set on Netlify) THEN all auth requests are relative URLs (`/api/auth/start/...`, `/api/auth/callback/...`, `/api/auth/me`, `/api/auth/logout`).
 
-2.2 WHEN the frontend makes a relative request to `/api/auth/start/{provider}` THEN the Netlify proxy intercepts it and rewrites it to the Railway backend at `https://insightx-production-e656a82c.up.railway.app/api/auth/start/{provider}`, but the browser sees the response originating from the same-origin (insight-dev.netlify.app).
+2.2 WHEN the frontend makes a relative request to `/api/auth/start/{provider}` THEN the Netlify proxy intercepts it and rewrites it to the Railway backend at `https://insightx-production-e656a82c.up.railway.app/api/auth/start/{provider}`, but the browser sees the response originating from the same-origin (insightx-dev.netlify.app).
 
-2.3 WHEN the Railway backend sets the OAuth state cookie in response to `/api/auth/start/{provider}` THEN the browser stores it as a first-party cookie on insight-dev.netlify.app (not the Railway domain), because it sees the Set-Cookie header from the same-origin proxy response.
+2.3 WHEN the Railway backend sets the OAuth state cookie in response to `/api/auth/start/{provider}` THEN the browser stores it as a first-party cookie on insightx-dev.netlify.app (not the Railway domain), because it sees the Set-Cookie header from the same-origin proxy response.
 
-2.4 WHEN the OAuth provider redirects back to `https://insightx-dev.netlify.app/api/auth/callback/{provider}` and the browser makes this request THEN it automatically includes the OAuth state cookie (because it is first-party to insight-dev.netlify.app), the Netlify proxy rewrites it to Railway, and the state validation succeeds.
+2.4 WHEN the OAuth provider redirects back to `https://insightx-dev.netlify.app/api/auth/callback/{provider}` and the browser makes this request THEN it automatically includes the OAuth state cookie (because it is first-party to insightx-dev.netlify.app), the Netlify proxy rewrites it to Railway, and the state validation succeeds.
 
 2.5 WHEN the OAuth callback succeeds THEN the Railway backend sets the session cookie (`insightx_sid`) with the same first-party domain behavior, and the app redirects to `/auth/complete`.
 
-2.6 WHEN `/auth/complete` calls `/api/auth/me` THEN the session cookie is included automatically (first-party to insight-dev.netlify.app), the request is routed through the Netlify proxy to Railway, and the user is returned from the session.
+2.6 WHEN `/auth/complete` calls `/api/auth/me` THEN the session cookie is included automatically (first-party to insightx-dev.netlify.app), the request is routed through the Netlify proxy to Railway, and the user is returned from the session.
 
-2.7 WHEN the user is successfully logged in THEN the app redirects to `/setup` with no auth error and displays the session user in the browser (DevTools > Application > Cookies shows `insightx_sid` under the insight-dev.netlify.app domain with HttpOnly and Secure flags).
+2.7 WHEN the user is successfully logged in THEN the app redirects to `/setup` with no auth error and displays the session user in the browser (DevTools > Application > Cookies shows `insightx_sid` under the insightx-dev.netlify.app domain with HttpOnly and Secure flags).
 
 ### Unchanged Behavior (Regression Prevention)
 

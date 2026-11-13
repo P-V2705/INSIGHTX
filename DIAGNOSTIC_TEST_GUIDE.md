@@ -16,12 +16,12 @@ Open DevTools (F12) with Network tab and Console visible. Execute each test in o
 
 ### Test A: Cookie Forwarding
 
-URL: https://insight-dev.netlify.app/api/diagnostic/set-cookie
+URL: https://insightx-dev.netlify.app/api/diagnostic/set-cookie
 
 What to check:
 1. Network tab: Look for the response header Set-Cookie: insightx_diagnostic_cookie=...
 2. Application > Cookies: Check if insightx_diagnostic_cookie is stored
-3. CRITICAL: Verify the cookie Domain is insight-dev.netlify.app (NOT railway.app)
+3. CRITICAL: Verify the cookie Domain is insightx-dev.netlify.app (NOT railway.app)
 4. Verify HttpOnly, Secure, and SameSite=Lax flags are set
 
 Expected Result:
@@ -30,11 +30,11 @@ Expected Result:
 
 ### Test B: Redirect Handling
 
-URL: https://insight-dev.netlify.app/api/diagnostic/redirect
+URL: https://insightx-dev.netlify.app/api/diagnostic/redirect
 
 What to check:
 1. Network tab: First request should show 302 redirect
-2. Location header should point to: https://insight-dev.netlify.app/api/diagnostic/redirect-target
+2. Location header should point to: https://insightx-dev.netlify.app/api/diagnostic/redirect-target
 3. Second request should automatically follow and display JSON response
 4. Verify the final page shows: "test": "B - Redirect Test"
 
@@ -48,7 +48,7 @@ Step 1: First, run Test A to set the diagnostic cookie
 
 Step 2: Then call this endpoint
 
-URL: https://insight-dev.netlify.app/api/diagnostic/read-cookie
+URL: https://insightx-dev.netlify.app/api/diagnostic/read-cookie
 
 What to check:
 1. Response JSON shows "diagnosticCookieReceived": "test_value_..." (NOT "not found")
@@ -60,13 +60,13 @@ Expected Result:
 
 ### Test D: Request Headers
 
-URL: https://insight-dev.netlify.app/api/diagnostic/headers
+URL: https://insightx-dev.netlify.app/api/diagnostic/headers
 
 What to check:
-1. "origin": Should be https://insight-dev.netlify.app
+1. "origin": Should be https://insightx-dev.netlify.app
 2. "xForwardedFor": Should contain client IP
 3. "xForwardedProto": Should be https
-4. "xForwardedHost": Should be insight-dev.netlify.app
+4. "xForwardedHost": Should be insightx-dev.netlify.app
 
 Expected Result:
 - PASS: All X-Forwarded-* headers present

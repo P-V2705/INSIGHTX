@@ -34,6 +34,8 @@ import {
   formatPercent,
 } from '../lib/format.js';
 
+import '../styles/setup-v2.css';
+
 const LEVEL_TAG = { info: 'INFO', ok: 'OK', warn: 'WARN', error: 'ERR' };
 const MAX_PREVIEW_ROWS = 8;
 
@@ -993,3 +995,6 @@ export default function SetupPage() {
     </>
   );
 }
+
+
+

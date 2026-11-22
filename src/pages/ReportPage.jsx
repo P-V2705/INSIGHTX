@@ -21,6 +21,7 @@ import {
 } from '../components/Icons.jsx';
 import { useSession } from '../session/SessionProvider.jsx';
 import { downloadChartSet, downloadSummaryCsv } from '../lib/exports.js';
+import '../styles/report-v2.css';
 import {
   formatBytes,
   formatCount,
@@ -501,3 +502,4 @@ export default function ReportPage() {
     </>
   );
 }
+

@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs';
+﻿import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
@@ -32,6 +32,11 @@ import {
   setSessionCookie,
 } from './session.js';
 import { setupDiagnosticEndpoints } from './diagnostic.js';
+import { parseMultipart } from './multipart-middleware.js';
+import { ensureUploadDir } from './dataset-upload.js';
+import datasetRouter from './routes-dataset.js';
+import analysisRouter from './routes-analysis.js';
+import reportRouter from './routes-report.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -109,6 +114,7 @@ app.use('/api', (req, res, next) => {
 
 app.use(express.json({ limit: '16kb' }));
 app.use(express.urlencoded({ extended: false, limit: '16kb' }));
+app.use(parseMultipart());
 
 function loginRedirect(res, code, { provider, next } = {}) {
   const params = new URLSearchParams({ auth_error: code });
@@ -267,6 +273,10 @@ async function handleCallback(req, res) {
 }
 
 app.get('/api/auth/callback/:provider', handleCallback);
+
+app.use('/api/datasets', datasetRouter);
+app.use('/api/analysis', analysisRouter);
+app.use('/api/reports', reportRouter);
 app.post('/api/auth/callback/:provider', handleCallback);
 
 app.use('/api', (req, res) => {
@@ -323,6 +333,12 @@ app.use((error, req, res, next) => {
   return res.status(500).type('text/plain').send('Insightx could not complete this request.');
 });
 
+// Initialize upload storage
+ensureUploadDir().catch((err) => {
+  console.error('[upload] Failed to initialize storage:', err.message);
+  process.exit(1);
+});
+
 app.listen(config.port, () => {
   console.log(`Insightx auth server listening on http://localhost:${config.port}`);
   if (config.originInsecure) {
@@ -343,6 +359,10 @@ app.listen(config.port, () => {
     console.log('[server] static file serving is disabled (SERVE_STATIC=false).');
   }
 });
+
+
+
+
 
 
 

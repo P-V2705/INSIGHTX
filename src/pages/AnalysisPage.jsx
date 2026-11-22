@@ -24,6 +24,7 @@ import { defaultAggregation } from '../lib/profile.js';
 import { buildReportSnapshot } from '../lib/report.js';
 import { FOCUS_OPTIONS, getFocus } from '../lib/focus.js';
 import { formatCount, formatCountUnit, formatDateTime, formatPercent } from '../lib/format.js';
+import '../styles/analysis-v2.css';
 
 function analysisTitle(analysis) {
   if (!analysis?.available) return 'Prepare the analysis';
@@ -478,3 +479,5 @@ export default function AnalysisPage() {
     </>
   );
 }
+
+

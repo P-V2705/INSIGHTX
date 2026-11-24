@@ -1,0 +1,407 @@
+﻿/* ============================================================
+   INSIGHTX 2.0 — Animation System
+   Lightweight CSS animations for smooth UI interactions
+   ============================================================ */
+
+/* ============================================================
+   Fade Animations
+   ============================================================ */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.fade-in {
+  animation: fade-in var(--duration-normal) var(--ease-out) forwards;
+}
+
+.fade-in-fast {
+  animation: fade-in var(--duration-fast) var(--ease-out) forwards;
+}
+
+.fade-in-slow {
+  animation: fade-in var(--duration-slow) var(--ease-out) forwards;
+}
+
+.fade-out {
+  animation: fade-out var(--duration-normal) var(--ease-in) forwards;
+}
+
+/* ============================================================
+   Slide Animations
+   ============================================================ */
+
+@keyframes slide-in-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-from-top {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-from-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in-left {
+  animation: slide-in-from-left var(--duration-slow) var(--ease-out) forwards;
+}
+
+.slide-in-right {
+  animation: slide-in-from-right var(--duration-slow) var(--ease-out) forwards;
+}
+
+.slide-in-top {
+  animation: slide-in-from-top var(--duration-slow) var(--ease-out) forwards;
+}
+
+.slide-in-bottom {
+  animation: slide-in-from-bottom var(--duration-slow) var(--ease-out) forwards;
+}
+
+/* ============================================================
+   Scale Animations
+   ============================================================ */
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.scale-in {
+  animation: scale-in var(--duration-normal) var(--ease-out) forwards;
+}
+
+.scale-out {
+  animation: scale-out var(--duration-normal) var(--ease-in) forwards;
+}
+
+/* ============================================================
+   Spin/Loading Animations
+   ============================================================ */
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* ============================================================
+   Bounce Animations (for emphasis)
+   ============================================================ */
+
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes bounce-in {
+  from {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.bounce {
+  animation: bounce 1s ease-in-out infinite;
+}
+
+.bounce-in {
+  animation: bounce-in var(--duration-slow) var(--ease-out) forwards;
+}
+
+/* ============================================================
+   Skeleton/Loading Animations
+   ============================================================ */
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-tertiary) 25%,
+    var(--color-border) 50%,
+    var(--color-bg-tertiary) 75%
+  );
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* ============================================================
+   Modal/Dialog Animations
+   ============================================================ */
+
+@keyframes modal-backdrop-in {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(4px);
+  }
+}
+
+@keyframes modal-content-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-enter {
+  animation: modal-content-in var(--duration-slow) var(--ease-out) forwards;
+}
+
+.modal-backdrop-enter {
+  animation: modal-backdrop-in var(--duration-slow) var(--ease-out) forwards;
+}
+
+/* ============================================================
+   Attention-Seeking Animations
+   ============================================================ */
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-5px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes jiggle {
+  0%,
+  100% {
+    transform: skewX(0deg);
+  }
+  25% {
+    transform: skewX(-5deg);
+  }
+  75% {
+    transform: skewX(5deg);
+  }
+}
+
+.shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.jiggle {
+  animation: jiggle 0.4s ease-in-out;
+}
+
+/* ============================================================
+   Progress Animations
+   ============================================================ */
+
+@keyframes progress-bars {
+  0%,
+  100% {
+    transform: scaleY(0.6);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.progress-bar-1 {
+  animation: progress-bars 1s ease-in-out infinite;
+}
+
+.progress-bar-2 {
+  animation: progress-bars 1s ease-in-out infinite 0.12s;
+}
+
+.progress-bar-3 {
+  animation: progress-bars 1s ease-in-out infinite 0.24s;
+}
+
+/* ============================================================
+   Glow Animations (for focus/active states)
+   ============================================================ */
+
+@keyframes glow {
+  from {
+    box-shadow: 0 0 0 0 var(--color-primary);
+  }
+  to {
+    box-shadow: 0 0 0 10px transparent;
+  }
+}
+
+.glow {
+  animation: glow 1.5s ease-out infinite;
+}
+
+/* ============================================================
+   Gradient Animations
+   ============================================================ */
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animated-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* ============================================================
+   Utility Animation Classes
+   ============================================================ */
+
+.animate-none {
+  animation: none !important;
+}
+
+.animation-paused {
+  animation-play-state: paused !important;
+}
+
+.animation-running {
+  animation-play-state: running !important;
+}
+
+/* ============================================================
+   Reduced Motion Preferences (Accessibility)
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

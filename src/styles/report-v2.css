@@ -1,0 +1,331 @@
+﻿/* ReportPage v2 - Dark Theme */
+
+/* Page Container */
+.report-page {
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+}
+
+/* Report Downloads Section */
+.report-downloads {
+  margin: var(--space-6) 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.report-downloads__copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.report-downloads__copy h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+  color: var(--color-text-primary);
+}
+
+.report-downloads__copy p {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.report-downloads__meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+}
+
+.report-downloads__meta .mono {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.report-downloads__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.report-downloads__note {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  padding: var(--space-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-primary);
+}
+
+.report-downloads__zip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: 700;
+  margin-left: auto;
+}
+
+/* Download Status */
+.report-download__status {
+  margin: var(--space-4) 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  line-height: 1.5;
+  display: none;
+}
+
+.report-download__status:not(:empty) {
+  display: block;
+}
+
+.report-download__status.is-success {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid #10B981;
+  color: #10B981;
+}
+
+.report-download__status.is-error {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid #EF4444;
+  color: #EF4444;
+}
+
+/* Report Summary Grid */
+.report-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: var(--space-6);
+  margin: var(--space-6) 0;
+}
+
+.report-summary {
+  margin: 0;
+}
+
+.report-summary .panel__body {
+  padding: var(--space-6);
+}
+
+/* Report Facts */
+.report-facts {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: var(--space-6);
+  row-gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+}
+
+.report-facts > div {
+  display: contents;
+}
+
+.report-facts dt {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.report-facts dd {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  margin: 0;
+  word-break: break-word;
+}
+
+.report-facts__hint {
+  display: block;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  margin-top: var(--space-1);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.report-facts__warning {
+  margin: var(--space-4) 0 0 0;
+  padding: var(--space-3);
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid #F59E0B;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  color: #F59E0B;
+  line-height: 1.5;
+}
+
+/* Report Source Link */
+.report-source-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity var(--duration-fast);
+}
+
+.report-source-link:hover {
+  opacity: 0.8;
+}
+
+/* Report Config Chips */
+.report-config-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0 0;
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+/* Report Metrics */
+.report-metrics {
+  margin: var(--space-6) 0;
+}
+
+/* Report Section Head */
+.report-section-head {
+  margin: var(--space-8) 0 var(--space-6) 0;
+}
+
+/* Report Chart */
+.report-chart {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.report-chart--gauge {
+  min-height: 250px;
+}
+
+/* Report Bar Panel */
+.report-bar-panel {
+  margin: var(--space-6) 0;
+  grid-column: 1 / -1;
+}
+
+/* Report Session Panel */
+.report-session-panel {
+  margin: var(--space-8) 0 0 0;
+  padding: 0;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--color-bg-tertiary) 0%, var(--color-bg-secondary) 100%);
+}
+
+.report-session-panel__copy {
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.report-session-panel__copy h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin: var(--space-1) 0 var(--space-2) 0;
+  color: var(--color-text-primary);
+}
+
+.report-session-panel__copy p {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.6;
+}
+
+.report-session-panel__actions {
+  padding: var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-bg-secondary);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .report-downloads {
+    grid-template-columns: 1fr;
+  }
+
+  .report-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .analysis-chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .report-downloads__actions {
+    flex-direction: column;
+  }
+
+  .report-session-panel__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .report-session-panel__actions .btn {
+    width: 100%;
+  }
+
+  .report-facts {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+    row-gap: var(--space-2);
+  }
+
+  .report-facts dt {
+    margin-bottom: var(--space-1);
+  }
+
+  .report-facts dd {
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .report-facts dd:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .report-downloads {
+    gap: var(--space-4);
+  }
+
+  .report-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .report-config-chips {
+    flex-direction: column;
+  }
+
+  .report-config-chips .chip {
+    width: 100%;
+  }
+}

@@ -1,0 +1,237 @@
+﻿/* ============================================================
+   INSIGHTX 2.0 — Design Tokens & Color System
+   Dark Theme — Premium SaaS Aesthetic
+   ============================================================ */
+
+:root {
+  /* ============================================================
+     Color Palette — Dark Theme
+     ============================================================ */
+
+  /* Backgrounds and Surfaces */
+  --color-bg-primary: #0B1020;           /* Main page background */
+  --color-bg-secondary: #10172A;         /* Sidebar, secondary surfaces */
+  --color-bg-tertiary: #151E33;          /* Cards, panels, modals */
+  --color-bg-overlay: rgba(0, 0, 0, 0.5); /* Modal backdrops */
+
+  /* Accent Colors */
+  --color-primary: #8B5CF6;              /* Primary actions, highlights, focus */
+  --color-primary-dark: #7C3AED;         /* Primary hover, gradient */
+  --color-secondary: #3B82F6;            /* Secondary actions */
+  --color-secondary-dark: #2563EB;       /* Secondary hover, gradient */
+
+  /* Text & Content */
+  --color-text-primary: #F8FAFC;         /* Main text, headings */
+  --color-text-secondary: #94A3B8;       /* Secondary text, labels, metadata */
+  --color-text-muted: #64748B;           /* Muted text, placeholders */
+
+  /* Borders & Dividers */
+  --color-border: #1E293B;               /* Borders, dividers */
+  --color-border-light: #334155;         /* Light borders */
+
+  /* Status Colors */
+  --color-success: #10B981;              /* Success states, checkmarks */
+  --color-success-light: #A7F3D0;        /* Success backgrounds */
+  --color-warning: #F59E0B;              /* Warning states, cautions */
+  --color-warning-light: #FEF3C7;        /* Warning backgrounds */
+  --color-error: #EF4444;                /* Error states, destructive */
+  --color-error-light: #FEE2E2;          /* Error backgrounds */
+  --color-info: #3B82F6;                 /* Info states */
+  --color-info-light: #DBEAFE;           /* Info backgrounds */
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+  --gradient-secondary: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+  --gradient-subtle: linear-gradient(135deg, #151E33 0%, #10172A 100%);
+
+  /* ============================================================
+     Typography
+     ============================================================ */
+
+  --font-family-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace;
+
+  /* Font Weights */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Type Scale */
+  --text-h1: 32px;
+  --text-h1-lh: 40px;
+  --text-h1-weight: 700;
+
+  --text-h2: 24px;
+  --text-h2-lh: 32px;
+  --text-h2-weight: 700;
+
+  --text-h3: 18px;
+  --text-h3-lh: 28px;
+  --text-h3-weight: 600;
+
+  --text-body-lg: 16px;
+  --text-body-lg-lh: 24px;
+  --text-body-lg-weight: 400;
+
+  --text-body: 14px;
+  --text-body-lh: 22px;
+  --text-body-weight: 400;
+
+  --text-body-sm: 12px;
+  --text-body-sm-lh: 18px;
+  --text-body-sm-weight: 400;
+
+  --text-label: 13px;
+  --text-label-lh: 20px;
+  --text-label-weight: 500;
+
+  --text-code: 13px;
+  --text-code-lh: 20px;
+  --text-code-weight: 400;
+
+  /* ============================================================
+     Spacing Scale (4px-based)
+     ============================================================ */
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 28px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ============================================================
+     Border Radius
+     ============================================================ */
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* ============================================================
+     Shadows
+     ============================================================ */
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+  /* ============================================================
+     Transitions & Animations
+     ============================================================ */
+
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-slower: 500ms;
+
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0.2, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ============================================================
+     Layout
+     ============================================================ */
+
+  --sidebar-width: 240px;
+  --header-height: 64px;
+  --header-height-mobile: 56px;
+  --container-max: 1440px;
+  --container-padding: 24px;
+
+  /* ============================================================
+     Breakpoints
+     ============================================================ */
+
+  --bp-mobile: 640px;
+  --bp-tablet: 1024px;
+  --bp-desktop: 1440px;
+}
+
+/* ============================================================
+   Utility Classes for Transitions
+   ============================================================ */
+
+.transition-all {
+  transition: all var(--duration-normal) var(--ease-in-out);
+}
+
+.transition-colors {
+  transition: color var(--duration-fast) var(--ease-in-out),
+              background-color var(--duration-fast) var(--ease-in-out),
+              border-color var(--duration-fast) var(--ease-in-out);
+}
+
+.transition-shadow {
+  transition: box-shadow var(--duration-fast) var(--ease-in-out);
+}
+
+.transition-transform {
+  transition: transform var(--duration-normal) var(--ease-in-out);
+}
+
+/* ============================================================
+   Focus States
+   ============================================================ */
+
+:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Selection
+   ============================================================ */
+
+::selection {
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+::-moz-selection {
+  background-color: var(--color-primary);
+  color: var(--color-text-primary);
+}
+
+/* ============================================================
+   Scrollbar Styles (Chrome, Safari, Edge)
+   ============================================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-light);
+}

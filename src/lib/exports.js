@@ -234,7 +234,7 @@ function triggerDownload(filename, blob) {
   window.setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
-function exportBaseName(report) {
+export function exportBaseName(report) {
   return `insightx-${filenameSlug(report.source?.fileName, 'session')}-${todayStamp()}`;
 }
 

@@ -1,0 +1,158 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// User model representing application users
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  displayName   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime? // Soft deletion support
+
+  // Relations
+  authIdentities   AuthIdentity[]
+  datasets         Dataset[]
+  analysisSessions AnalysisSession[]
+  reports          Report[]
+  preferences      UserPreference?
+
+  @@index([email])
+  @@index([deletedAt])
+}
+
+// Authentication identities (OAuth providers)
+model AuthIdentity {
+  id           String   @id @default(cuid())
+  provider     String   // e.g., "google", "github"
+  providerUserId String
+  email        String
+  displayName  String?
+  avatarUrl    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@index([email])
+}
+
+// Dataset model for uploaded files
+model Dataset {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  fileName    String
+  mimeType    String   // e.g., "text/csv", "application/vnd.ms-excel"
+  fileSize    BigInt   // File size in bytes
+  rowCount    Int?     // Number of rows in the dataset
+  columnCount Int?     // Number of columns
+  columns     String[] // Column names stored as JSON array
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  deletedAt   DateTime? // Soft deletion support
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  analysisSessions AnalysisSession[]
+  
+  @@index([userId])
+  @@index([deletedAt])
+  @@index([createdAt])
+}
+
+// Analysis session model
+model AnalysisSession {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?
+  status       String   @default("active") // active, completed, archived
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  deletedAt    DateTime? // Soft deletion support
+
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  datasetId    String
+  dataset      Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+
+  results      AnalysisResult[]
+  reports      Report[]
+
+  @@index([userId])
+  @@index([datasetId])
+  @@index([deletedAt])
+}
+
+// Analysis result model for storing computation results
+model AnalysisResult {
+  id              String   @id @default(cuid())
+  resultType      String   // e.g., "summary", "correlation", "pivot", "chart"
+  resultData      String   // JSON string containing the analysis result
+  chartType       String?  // For visualization results
+  description     String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  sessionId       String
+  analysisSession AnalysisSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@index([resultType])
+}
+
+// Report model for exporting analyses
+model Report {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  content     String   // HTML or JSON content of the report
+  format      String   @default("html") // html, pdf, csv
+  status      String   @default("draft") // draft, published, archived
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  publishedAt DateTime?
+  deletedAt   DateTime? // Soft deletion support
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  sessionId   String
+  session     AnalysisSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+// User preferences model
+model UserPreference {
+  id                      String   @id @default(cuid())
+  theme                   String   @default("light") // light, dark
+  defaultChartType        String   @default("bar")
+  notificationsEnabled    Boolean  @default(true)
+  autoExportReports       Boolean  @default(false)
+  defaultExportFormat     String   @default("html") // html, pdf, csv
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  userId                  String   @unique
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

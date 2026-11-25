@@ -1,0 +1,190 @@
+﻿/* ============================================================
+   Modal Component — Dark Theme
+   ============================================================ */
+
+.modal {
+  border: none;
+  padding: 0;
+  background: transparent;
+  max-width: calc(100vw - 32px);
+  border-radius: 0;
+}
+
+.modal::backdrop {
+  background: var(--color-bg-overlay);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: fade-in var(--duration-slow) var(--ease-out);
+}
+
+/* ============================================================
+   Modal Sizes
+   ============================================================ */
+
+.modal--sm {
+  width: min(320px, 100vw - 32px);
+}
+
+.modal--md {
+  width: min(500px, 100vw - 32px);
+}
+
+.modal--lg {
+  width: min(700px, 100vw - 32px);
+}
+
+/* ============================================================
+   Modal Content
+   ============================================================ */
+
+.modal__content {
+  background: var(--color-bg-tertiary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  animation: scale-in var(--duration-slow) var(--ease-out);
+}
+
+/* ============================================================
+   Modal Header
+   ============================================================ */
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.modal__title {
+  margin: 0;
+  font-size: var(--text-h2);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--text-h2-lh);
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+}
+
+.modal__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--duration-fast) var(--ease-in-out);
+  transition-property: background-color, color;
+}
+
+.modal__close:hover {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+}
+
+.modal__close:focus-visible {
+  outline: 3px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ============================================================
+   Modal Body
+   ============================================================ */
+
+.modal__body {
+  padding: var(--space-6);
+  flex: 1;
+  overflow-y: auto;
+}
+
+.modal__body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal__body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modal__body::-webkit-scrollbar-thumb {
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-full);
+}
+
+.modal__body::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-light);
+}
+
+/* ============================================================
+   Modal Footer
+   ============================================================ */
+
+.modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-6);
+  border-top: 1px solid var(--color-border);
+  background: rgba(139, 92, 246, 0.02);
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+
+@media (max-width: 640px) {
+  .modal--sm,
+  .modal--md,
+  .modal--lg {
+    width: calc(100vw - 24px);
+  }
+
+  .modal__content {
+    max-height: 95vh;
+  }
+
+  .modal__header {
+    padding: var(--space-4);
+  }
+
+  .modal__title {
+    font-size: var(--text-h3);
+  }
+
+  .modal__body {
+    padding: var(--space-4);
+  }
+
+  .modal__footer {
+    padding: var(--space-4);
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .modal__footer button {
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   Accessibility
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  .modal::backdrop {
+    animation: none;
+  }
+
+  .modal__content {
+    animation: none;
+  }
+}

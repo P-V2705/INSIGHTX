@@ -1,9 +1,10 @@
-import { Suspense } from 'react';
+﻿import { Suspense } from 'react';
 import { Outlet } from 'react-router-dom';
 import { AppHeader } from './AppHeader.jsx';
 import { WorkspaceFooter } from './SiteFooter.jsx';
 import { useSession } from '../session/SessionProvider.jsx';
 import { AlertTriangle } from './Icons.jsx';
+import '../styles/workspace.css';
 
 function WorkspaceLoading() {
   return (
